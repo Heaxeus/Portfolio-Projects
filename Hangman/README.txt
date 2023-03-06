@@ -1,1 +1,1 @@
-This i sthe README for my Hangman Project
+This is the README for my Hangman Project
