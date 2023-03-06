@@ -41,20 +41,6 @@ public class Main {
      */
     public static void start() {
 
-        //Resets gallows and lettersGuessed variables
-        gallows = new String[][]{
-                {" ", " ", "_", "_", "_", "_", "_", " ", " "},
-                {" ", " ", "|", " ", " ", " ", "|", " ", " "},
-                {" ", " ", "|", " ", " ", " ", " ", " ", " "},
-                {" ", " ", "|", " ", " ", " ", " ", " ", " "},
-                {" ", " ", "|", " ", " ", " ", " ", " ", " "},
-                {" ", " ", "|", " ", " ", " ", " ", " ", " "},
-                {"_", "_", "_", "_", "_", "_", "_", "_", "_"}
-        };
-
-        lettersGuessed = "";
-
-
         println("To respond to prompts, please type what is in quotes(''), including the hash symbol(#)");
         println("Would you like to '#play' the game, or '#add' a word to the word list?");
 
@@ -91,6 +77,20 @@ public class Main {
      */
     public static void game() {
         println("Please type in the word to guess, or say '#random' to pull a random word from the word list.");
+
+        //Resets gallows and lettersGuessed variables
+        gallows = new String[][]{
+                {" ", " ", "_", "_", "_", "_", "_", " ", " "},
+                {" ", " ", "|", " ", " ", " ", "|", " ", " "},
+                {" ", " ", "|", " ", " ", " ", " ", " ", " "},
+                {" ", " ", "|", " ", " ", " ", " ", " ", " "},
+                {" ", " ", "|", " ", " ", " ", " ", " ", " "},
+                {" ", " ", "|", " ", " ", " ", " ", " ", " "},
+                {"_", "_", "_", "_", "_", "_", "_", "_", "_"}
+        };
+
+        lettersGuessed = "";
+
 
         int numOfWords = 0;
         String word = "";
