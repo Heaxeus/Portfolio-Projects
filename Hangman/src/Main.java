@@ -81,7 +81,6 @@ public class Main {
                 writeCall.close();
                 start();
             } catch (IOException e) {
-                checkWordFile();
                 start();
             }
         }
@@ -110,13 +109,13 @@ public class Main {
 
                     int lineChoice = (int) (Math.random() * numOfWords);
                     word = Files.readAllLines(file).get(lineChoice);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     println("Word could not be chosen.");
-                    game();
+                    start();
                 }
             } else {
-                println("Word file must exist for random word to be chosen!");
-                game();
+                println("Please add a word to the word list to pull.");
+                start();
             }
         } else {
             word = response;
@@ -182,7 +181,7 @@ public class Main {
                 words.createNewFile();
                 println("File Created!");
                 println("", 5);
-                return true;
+                return false;
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
