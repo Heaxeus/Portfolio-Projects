@@ -9,6 +9,7 @@ import java.util.Scanner;
 
 public class Main {
 
+
     //Global scanner prompt
     public static Scanner prompt = new Scanner(System.in);
 
