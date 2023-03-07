@@ -140,7 +140,7 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D) {
             if (playerX >= 600) {
                 playerX = 600;
             } else {
@@ -149,7 +149,7 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         }
 
 
-        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+        if (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_A) {
             if (playerX <= 10) {
                 playerX = 10;
             } else {
