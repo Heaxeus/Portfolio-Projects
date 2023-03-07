@@ -114,6 +114,7 @@ public class GamePlay extends JPanel implements ActionListener {
                     ballPosY = 500;
                     ballXDir = 0;
                     ballYDir = 6;
+                    score = 0;
                     brickNumberRows = (int)(Math.random()*10)+1;
                     brickNumberCols = (int)(Math.random()*30)+1;
                     totalBricks = brickNumberCols*brickNumberRows;
