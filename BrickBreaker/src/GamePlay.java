@@ -3,9 +3,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
-public class GamePlay extends JPanel implements KeyListener, ActionListener {
+public class GamePlay extends JPanel implements ActionListener {
 
     private boolean playing = false;
     private int score = 0;
@@ -18,15 +17,20 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
     private int ballXDir = -1;
     private int ballYDir = -2;
 
+    private int velX = 0;
+
     private MapGenerator map;
+
+    private JComponent component;
 
     public GamePlay(){
         map = new MapGenerator(3, 7);
-        addKeyListener(this);
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
-        timer = new Timer(delay, this);
+        timer = new Timer(0, this);
         timer.start();
+        keyBindings();
+        playing = true;
     }
 
     public void paint(Graphics graphics){
@@ -76,20 +80,51 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         graphics.dispose();
     }
 
-    public void moveRight(){
-        playing = true;
-        playerX += 10;
+    public void setVelX(int velX){
+        this.velX = velX;
     }
 
-    public void moveLeft(){
-        playing = true;
-        playerX -= 10;
+
+    public void keyBindings(){
+        this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "left-pressed");
+        this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, true), "left-released");
+        this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "right-pressed");
+        this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, true), "right-released");
+
+
+        this.getActionMap().put("left-pressed", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                setVelX(-5);
+            }
+        });
+
+        this.getActionMap().put("left-released", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                setVelX(0);
+            }
+        });
+
+        this.getActionMap().put("right-pressed", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                setVelX(5);
+            }
+        });
+
+        this.getActionMap().put("right-released", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                setVelX(0);
+            }
+        });
+
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        timer.start();
+
         if (playing){
+
+            playerX += velX;
+
             if (new Rectangle(ballPosX, ballPosY, 20, 20).intersects(new Rectangle(playerX, 550, 100, 8))){
                 ballYDir = -ballYDir;
             }
@@ -133,19 +168,13 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         repaint();
     }
 
-    @Override
-    public void keyTyped(KeyEvent e) {
-
-    }
-
-    @Override
     public void keyPressed(KeyEvent e) {
 
         if (e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D) {
-            if (playerX >= 600) {
-                playerX = 600;
+            if (playerX >= 590) {
+                playerX = 590;
             } else {
-                moveRight();
+
             }
         }
 
@@ -154,7 +183,7 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
             if (playerX <= 10) {
                 playerX = 10;
             } else {
-                moveLeft();
+
             }
         }
 
@@ -172,8 +201,5 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
             }
         }
     }
-    @Override
-    public void keyReleased(KeyEvent e) {
 
-    }
 }
