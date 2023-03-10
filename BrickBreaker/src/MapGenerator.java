@@ -23,7 +23,7 @@ public class MapGenerator {
                 if (map[i][j] > 0){
                     graphics.setColor(Color.red);
                     graphics.fillRect(j*brickWidth+80, i*brickHeight+50, brickWidth, brickHeight);
-                    graphics.setStroke(new BasicStroke(3));
+                    graphics.setStroke(new BasicStroke(6));
                     graphics.setColor(Color.black);
                     graphics.drawRect(j*brickWidth+80, i*brickHeight+50, brickWidth, brickHeight);
                 }

@@ -3,43 +3,53 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
+import java.util.Iterator;
+import java.util.Queue;
+import java.util.LinkedList;
 
 public class GamePlay extends JPanel implements ActionListener {
 
-    private boolean playing = false;
+    private boolean playing;
     private int score = 0;
 
+    public Queue<Rectangle> trail = new LinkedList<>();
 
-    private Timer timer;
-    private int delay = 8;
     private int playerX = 310;
-    private int playerY = 550;
     private int ballPosX = playerX + 40;
     private int ballPosY = 500;
     private double ballXDir = 0;
     private double ballYDir = 6;
 
-    private boolean[] activeKeys = new boolean[2];
+    private final boolean[] activeKeys = new boolean[2];
 
     private int brickNumberRows;
     private int brickNumberCols;
 
     private int totalBricks;
 
+
+
+    private final int targetTps = 1000/60;
+    private int lastTime = (int) System.currentTimeMillis();
+    private int targetTime = lastTime + targetTps;
+
+
+
+
+
+
     private MapGenerator map;
 
-    private JComponent component;
 
     public GamePlay() {
         brickNumberRows = (int)(Math.random()*10)+1;
         brickNumberCols = (int)(Math.random()*30)+1;
         totalBricks = brickNumberRows*brickNumberCols;
-        map = new MapGenerator(brickNumberRows, brickNumberCols);
+        map = new MapGenerator( brickNumberRows, brickNumberCols);
         setFocusable(true);
         setDoubleBuffered(true);
         setFocusTraversalKeysEnabled(false);
-        timer = new Timer(0, this);
+        Timer timer = new Timer(0, this);
         timer.start();
         keyBindings();
         playing = true;
@@ -60,6 +70,7 @@ public class GamePlay extends JPanel implements ActionListener {
         graphics.drawString("" + score, 590, 30);
 
         graphics.setColor(Color.yellow);
+        int playerY = 550;
         graphics.fillRect(playerX, playerY, 100, 8);
 
         graphics.setColor(Color.green);
@@ -88,7 +99,18 @@ public class GamePlay extends JPanel implements ActionListener {
             totalBricks = brickNumberCols*brickNumberRows;
             map = new MapGenerator(brickNumberRows, brickNumberCols);
             playing = true;
-            repaint();
+            paintImmediately(1, 1, 692, 592);
+        }
+
+
+        Iterator iter = trail.iterator();
+        double portion = 0.2;
+        while(iter.hasNext()){
+            graphics.setColor(Color.green);
+            Rectangle temp = (Rectangle) iter.next();
+            System.out.println(temp.x);
+            graphics.fillOval(temp.x + ((temp.width - (int)(temp.width*portion))/2), temp.y + ((temp.height - (int)(temp.height*portion))/2) , (int)(temp.width*portion), (int)(temp.height*portion));
+            portion += 0.2;
         }
 
         graphics.dispose();
@@ -120,7 +142,7 @@ public class GamePlay extends JPanel implements ActionListener {
                     totalBricks = brickNumberCols*brickNumberRows;
                     map = new MapGenerator(brickNumberRows, brickNumberCols);
                     playing = true;
-                    repaint();
+                    paintImmediately(1, 1, 692, 592);
                 }
             }
         });
@@ -155,30 +177,56 @@ public class GamePlay extends JPanel implements ActionListener {
         });
     }
 
-    private int playerMovementLeft = -5;
-    private int playerMovementRight = 5;
+
 
     @Override
     public void actionPerformed(ActionEvent e) {
 
         if (playing) {
 
+            int current = (int) System.currentTimeMillis();
+            if (current < targetTime) return;
+            lastTime = current;
+            targetTime = (current+targetTps) - (current - targetTime);
+
+
+
+
+
+
+
             if (activeKeys[0] && playerX >=10){
+                int playerMovementLeft = -5;
                 playerX += playerMovementLeft;
             }
             if (activeKeys[1] && playerX <= 585){
+                int playerMovementRight = 5;
                 playerX += playerMovementRight;
             }
 
+            int ballProjectedPositionX = (int) (ballPosX + ballXDir);
+            int ballProjectedPositionY = (int) (ballPosY + ballYDir);
+
+            System.out.println("Ball X: " + ballPosX);
+            System.out.println("Ball Y: " + ballPosY);
+            System.out.println("Ball Projected X: " + ballProjectedPositionX);
+            System.out.println("Ball Projected Y: " + ballProjectedPositionY);
+
+
+            System.out.println();
+
+            Rectangle ballRect = new Rectangle(ballPosX, ballPosY, 20, 20);
+            Rectangle ballProjectedRect = new Rectangle(ballProjectedPositionX, ballProjectedPositionY, 20, 20);
 
 
 
-            if (new Rectangle(ballPosX, ballPosY, 20, 20).intersects(new Rectangle(playerX, 550, 100, 8))) {
+            if (ballProjectedRect.intersects(new Rectangle(playerX, 550, 100, 8))) {
+                ballPosY = 530;
                 ballYDir = -ballYDir;
                 if (activeKeys[0]) ballXDir = -6;
                 if (activeKeys[1]) ballXDir = 6;
-
             }
+
             A:
             for (int i = 0; i < map.map.length; i++) {
                 for (int j = 0; j < map.map[0].length; j++) {
@@ -189,34 +237,63 @@ public class GamePlay extends JPanel implements ActionListener {
                         int bricksHeight = map.brickHeight;
 
                         Rectangle rect = new Rectangle(brickX, brickY, bricksWidth, bricksHeight);
-                        Rectangle ballRect = new Rectangle(ballPosX, ballPosY, 20, 20);
 
 
-                        if (ballRect.intersects(rect)) {
+
+                        if (ballProjectedRect.intersects(rect)) {
+                            System.out.println("Rectangle X: " + rect.x);
+                            System.out.println("Rectangle Y: " + rect.y);
+                            System.out.println();
+
                             map.setBrickValue(0, i, j);
                             totalBricks--;
                             score += 1;
-                            if (ballPosX + 19 <= rect.x || ballPosX + 2 >= rect.x + bricksWidth) {
+
+                            if(ballPosX + 14 <= rect.x){
                                 ballXDir *= -1;
-                            } else {
+                                ballPosX = rect.x - 14;
+                            }else if(ballPosX + 7 >= rect.x + bricksWidth){
+                                ballXDir *= -1;
+                                ballPosX = rect.x + bricksWidth - 7;
+                            }else if(ballPosY + 14 <= rect.y){
                                 ballYDir *= -1;
+                                ballPosY = rect.y - 14;
+                            }else if(ballPosY + 6 >= rect.y + bricksHeight){
+                                ballYDir *= -1;
+                                ballPosY = rect.y + bricksHeight - 6;
                             }
                             break A;
                         }
                     }
                 }
             }
+
             ballPosX += ballXDir;
             ballPosY += ballYDir;
 
-            if (ballPosX < 0 || ballPosX > 670) {
+            if(trail.size() == 4){
+                trail.remove();
+            }
+            trail.add(ballRect);
+
+
+
+
+
+            if (ballPosX < 3 ){
+                ballPosX = 3;
+                ballXDir = -ballXDir;
+            } else if(ballPosX > 670) {
+                ballPosX = 670;
                 ballXDir = -ballXDir;
             }
-            if (ballPosY < 0) {
+
+            if (ballPosY < 3) {
+                ballPosY = 3;
                 ballYDir = -ballYDir;
             }
         }
-        repaint();
+        paintImmediately(1, 1, 692, 592);
     }
 
 
